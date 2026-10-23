@@ -109,92 +109,34 @@ Pastikan perangkat sudah memiliki:
    flutter run
    ```
 
-## 🖼️ Screenshot Aplikasi
+## Application Screenshots
 
-Tambahkan screenshot aplikasi pada bagian ini agar pembaca dapat melihat tampilan dan alur penggunaan Quizzy.
+Dokumentasi screenshot seluruh halaman aplikasi Quizzy dapat dilihat melalui tautan berikut:
 
-### 1. Home Screen
-
-Halaman utama untuk memulai kuis dan membuka riwayat permainan.
-
-![Home Screen](screenshots/home_screen.png)
-
-### 2. Name Screen
-
-Halaman untuk memasukkan nama pemain.
-
-![Name Screen](screenshots/name_screen.png)
-
-### 3. Category Screen
-
-Halaman pemilihan kategori kuis.
-
-![Category Screen](screenshots/category_screen.png)
-
-### 4. Topic Screen
-
-Halaman pemilihan topik berdasarkan kategori.
-
-![Topic Screen](screenshots/topic_screen.png)
-
-### 5. Difficulty Screen
-
-Halaman untuk memilih tingkat kesulitan.
-
-![Difficulty Screen](screenshots/difficulty_screen.png)
-
-### 6. Quiz Screen
-
-Halaman pengerjaan soal pilihan ganda.
-
-![Quiz Screen](screenshots/quiz_screen.png)
-
-### 7. Result Screen
-
-Halaman hasil kuis yang menampilkan skor dan ulasan jawaban.
-
-![Result Screen](screenshots/result_screen.png)
-
-### 8. History Screen
-
-Halaman untuk melihat riwayat permainan yang tersimpan.
-
-![History Screen](screenshots/history_screen.png)
-
-### 9. Dark Mode
-
-Contoh tampilan aplikasi ketika menggunakan tema gelap.
-
-![Dark Mode](screenshots/dark_mode.png)
-
-> **Catatan:** Simpan screenshot asli aplikasi ke dalam folder `screenshots/` menggunakan nama file yang tercantum di atas. Jika suatu halaman atau fitur belum berhasil diuji, pastikan fitur tersebut berfungsi sebelum mengambil screenshot untuk dokumentasi.
+📸 https://drive.google.com/drive/folders/1zXgJczZ6UjUvzXgCGJ0vdN_8xdbV10Sf
 
 ## 🎨 Desain dan Prototype
 
 Link desain atau prototype aplikasi:
 
-**Figma:** [Tambahkan link prototype Figma di sini]
+**Figma:** https://www.figma.com/design/j1BpoGHhdLevfYtIx4TcE1/Quizzy?node-id=0-1&t=DKoHxHaWWTzPk5c4-1
 
 ## 🎥 Video Presentasi
 
 Video presentasi Quizzy menjelaskan fitur aplikasi, alur penggunaan, dan implementasi fitur utama.
 
-**Google Drive:** [Tambahkan link video presentasi di sini]
-
-Durasi video: maksimal 10 menit.
+**Google Drive:** https://drive.google.com/file/d/1SEXetw20FMeZkR7uQBFqKAYfOkGw49GD/view?usp=drivesdk
 
 ## 📦 Kredit Aset
 
 - **Font Nunito:** [Google Fonts — Nunito](https://fonts.google.com/specimen/Nunito)
 - **Ikon antarmuka:** Menggunakan ikon bawaan Flutter Material Icons.
-- **Ilustrasi atau aset tambahan:** Cantumkan sumber dan lisensi aset yang benar-benar digunakan dalam aplikasi.
 
 ## 📌 Pengembangan Selanjutnya
 
 Beberapa pengembangan yang dapat dipertimbangkan untuk Quizzy:
 - Menambahkan lebih banyak variasi soal.
 - Menyediakan statistik perkembangan skor pengguna.
-- Mengembangkan fitur pengacakan soal.
 - Menambahkan kategori kuis baru.
 
 ## 📄 Lisensi
