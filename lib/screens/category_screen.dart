@@ -11,18 +11,26 @@ class CategoryScreen extends StatelessWidget {
   });
 
   static const Color primaryColor = Color(0xFF7655E8);
-  static const Color darkColor = Color(0xFF292344);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = isDark
+        ? Colors.white70
+        : const Color(0xFF77738A);
+    final cardColor = theme.colorScheme.surface;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Pilih Kategori',
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
-        backgroundColor: const Color(0xFFF8F7FF),
-        foregroundColor: darkColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: textColor,
         elevation: 0,
       ),
       body: SafeArea(
@@ -32,20 +40,20 @@ class CategoryScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                const Text(
+                Text(
                   'Mau belajar apa hari ini?',
                   style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w900,
-                    color: darkColor,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Pilih kategori yang ingin kamu pelajari.',
                   style: TextStyle(
                     fontSize: 15,
-                    color: Colors.black54,
+                    color: mutedColor,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -54,8 +62,9 @@ class CategoryScreen extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Material(
-                      color: Colors.white,
+                      color: cardColor,
                       borderRadius: BorderRadius.circular(22),
+                      clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(22),
                         onTap: () {
@@ -74,7 +83,7 @@ class CategoryScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(22),
                             border: Border.all(
-                              color: primaryColor.withValues(alpha: 0.12),
+                              color: primaryColor.withValues(alpha: 0.25),
                             ),
                           ),
                           child: Row(
@@ -84,7 +93,9 @@ class CategoryScreen extends StatelessWidget {
                                 height: 58,
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: primaryColor.withValues(alpha: 0.10),
+                                  color: primaryColor.withValues(
+                                    alpha: isDark ? 0.25 : 0.10,
+                                  ),
                                   borderRadius: BorderRadius.circular(18),
                                 ),
                                 child: Text(
@@ -99,21 +110,25 @@ class CategoryScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       category.title,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w800,
-                                        color: darkColor,
+                                        color: textColor,
                                       ),
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
                                       category.description,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.black54,
+                                        color: mutedColor,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
+                                    const Text(
+                                      ' ',
+                                      style: TextStyle(fontSize: 0),
+                                    ),
                                     Text(
                                       '${category.topics.length} topik tersedia',
                                       style: const TextStyle(
@@ -125,6 +140,7 @@ class CategoryScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               const Icon(
                                 Icons.arrow_forward_ios_rounded,
                                 size: 17,

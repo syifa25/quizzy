@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'result_screen.dart';
 import '../models/question.dart';
-
-
+import '../models/quiz_history.dart';
+import '../services/history_service.dart';
 
 class QuizScreen extends StatefulWidget {
   final String playerName;
@@ -10,7 +10,6 @@ class QuizScreen extends StatefulWidget {
   final String categoryName;
   final String topicName;
   final String difficulty;
-  
 
   const QuizScreen({
     super.key,
@@ -35,8 +34,6 @@ class _QuizScreenState extends State<QuizScreen> {
   final List<int?> userAnswers = [];
 
   static const Color primaryColor = Color(0xFF7655E8);
-  static const Color darkColor = Color(0xFF292344);
-  static const Color backgroundColor = Color(0xFFF8F7FF);
   static const Color greenColor = Color(0xFF27AE60);
   static const Color redColor = Color(0xFFE85D75);
 
@@ -54,7 +51,6 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       isAnswerChecked = true;
 
-      // Simpan jawaban yang dipilih pemain.
       userAnswers.add(selectedAnswerIndex);
 
       if (selectedAnswerIndex ==
@@ -64,8 +60,10 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-  void nextQuestion() {
-    if (!isAnswerChecked) return;
+  bool isSavingResult = false;
+
+  Future<void> nextQuestion() async {
+    if (isSavingResult) return;
 
     if (currentQuestionIndex < widget.questions.length - 1) {
       setState(() {
@@ -73,7 +71,28 @@ class _QuizScreenState extends State<QuizScreen> {
         selectedAnswerIndex = null;
         isAnswerChecked = false;
       });
-    } else {
+      return;
+    }
+
+    // Cegah penyimpanan ganda ketika tombol ditekan berulang kali.
+    isSavingResult = true;
+
+    try {
+      final history = QuizHistory(
+        playerName: widget.playerName,
+        categoryName: widget.categoryName,
+        topicName: widget.topicName,
+        difficulty: widget.difficulty,
+        score: score,
+        totalQuestions: widget.questions.length,
+        completedAt: DateTime.now(),
+      );
+
+      // Simpan hasil kuis sebelum pindah ke halaman hasil.
+      await HistoryService.saveHistory(history);
+
+      if (!mounted) return;
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -86,12 +105,48 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
         ),
       );
+    } catch (e) {
+      isSavingResult = false;
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Riwayat gagal disimpan. Coba lagi.'),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.colorScheme.surface;
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = isDark ? Colors.white70 : const Color(0xFF77738A);
+    final borderColor = theme.colorScheme.outlineVariant;
+    final selectedColor = theme.colorScheme.primaryContainer;
+    final selectedTextColor = theme.colorScheme.onPrimaryContainer;
+    final explanationColor = isDark
+        ? const Color(0xFF302B43)
+        : const Color(0xFFF8F7FF);
+
     final questions = widget.questions;
+
+    if (questions.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Quiz Time'),
+        ),
+        body: const Center(
+          child: Text('Belum ada pertanyaan untuk kuis ini.'),
+        ),
+      );
+    }
+
     final question = questions[currentQuestionIndex];
     final progress = (currentQuestionIndex + 1) / questions.length;
 
@@ -99,13 +154,13 @@ class _QuizScreenState extends State<QuizScreen> {
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
-                title: Text(
+        foregroundColor: textColor,
+        elevation: 0,
+        title: Text(
           'Quiz Time, ${widget.playerName}!',
-          style: const TextStyle(fontWeight: FontWeight.w800),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => Navigator.pop(context),
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
       body: SafeArea(
@@ -131,8 +186,8 @@ class _QuizScreenState extends State<QuizScreen> {
                       ),
                       Text(
                         '${currentQuestionIndex + 1}/${questions.length}',
-                        style: const TextStyle(
-                          color: darkColor,
+                        style: TextStyle(
+                          color: textColor,
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
                         ),
@@ -147,7 +202,9 @@ class _QuizScreenState extends State<QuizScreen> {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 10,
-                      backgroundColor: const Color(0xFFE7E1FA),
+                      backgroundColor: isDark
+                          ? const Color(0xFF39334D)
+                          : const Color(0xFFE7E1FA),
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         primaryColor,
                       ),
@@ -160,8 +217,13 @@ class _QuizScreenState extends State<QuizScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: cardColor,
                       borderRadius: BorderRadius.circular(24),
+                      border: isDark
+                          ? Border.all(
+                              color: theme.colorScheme.outlineVariant,
+                            )
+                          : null,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +234,9 @@ class _QuizScreenState extends State<QuizScreen> {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF0EBFF),
+                            color: isDark
+                                ? const Color(0xFF302B43)
+                                : const Color(0xFFF0EBFF),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Text(
@@ -189,8 +253,8 @@ class _QuizScreenState extends State<QuizScreen> {
 
                         Text(
                           question.question,
-                          style: const TextStyle(
-                            color: darkColor,
+                          style: TextStyle(
+                            color: textColor,
                             fontSize: 23,
                             height: 1.4,
                             fontWeight: FontWeight.w900,
@@ -206,22 +270,31 @@ class _QuizScreenState extends State<QuizScreen> {
                             final isCorrect =
                                 index == question.correctAnswerIndex;
 
-                            Color borderColor = const Color(0xFFE9E6F2);
-                            Color optionColor = Colors.white;
-                            Color textColor = darkColor;
+                            Color optionBorderColor = borderColor;
+                            Color optionColor = cardColor;
+                            Color optionTextColor = textColor;
+                            Color letterColor = textColor;
                             IconData? trailingIcon;
 
                             if (isAnswerChecked && isCorrect) {
-                              borderColor = greenColor;
-                              optionColor = const Color(0xFFE9F8EF);
+                              optionBorderColor = greenColor;
+                              optionColor = isDark
+                                  ? const Color(0xFF183D2A)
+                                  : const Color(0xFFE9F8EF);
+                              letterColor = greenColor;
                               trailingIcon = Icons.check_circle_rounded;
                             } else if (isAnswerChecked && isSelected) {
-                              borderColor = redColor;
-                              optionColor = const Color(0xFFFFEDF0);
+                              optionBorderColor = redColor;
+                              optionColor = isDark
+                                  ? const Color(0xFF45232D)
+                                  : const Color(0xFFFFEDF0);
+                              letterColor = redColor;
                               trailingIcon = Icons.cancel_rounded;
                             } else if (isSelected) {
-                              borderColor = primaryColor;
-                              optionColor = const Color(0xFFF0EBFF);
+                              optionBorderColor = primaryColor;
+                              optionColor = selectedColor;
+                              optionTextColor = selectedTextColor;
+                              letterColor = selectedTextColor;
                             }
 
                             return Padding(
@@ -236,8 +309,8 @@ class _QuizScreenState extends State<QuizScreen> {
                                     color: optionColor,
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: borderColor,
-                                      width: 1.5,
+                                      color: optionBorderColor,
+                                      width: isSelected ? 2 : 1.5,
                                     ),
                                   ),
                                   child: Row(
@@ -247,7 +320,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                         height: 34,
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
-                                          color: borderColor.withValues(
+                                          color: optionBorderColor.withValues(
                                             alpha: 0.15,
                                           ),
                                           borderRadius:
@@ -256,11 +329,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                         child: Text(
                                           String.fromCharCode(65 + index),
                                           style: TextStyle(
-                                            color: isSelected ||
-                                                    (isAnswerChecked &&
-                                                        isCorrect)
-                                                ? borderColor
-                                                : textColor,
+                                            color: letterColor,
                                             fontWeight: FontWeight.w900,
                                           ),
                                         ),
@@ -272,7 +341,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                         child: Text(
                                           question.options[index],
                                           style: TextStyle(
-                                            color: textColor,
+                                            color: optionTextColor,
                                             fontWeight: FontWeight.w700,
                                             fontSize: 14,
                                           ),
@@ -282,7 +351,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                       if (trailingIcon != null)
                                         Icon(
                                           trailingIcon,
-                                          color: borderColor,
+                                          color: optionBorderColor,
                                         ),
                                     ],
                                   ),
@@ -298,13 +367,13 @@ class _QuizScreenState extends State<QuizScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8F7FF),
+                              color: explanationColor,
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Text(
                               question.explanation,
-                              style: const TextStyle(
-                                color: darkColor,
+                              style: TextStyle(
+                                color: textColor,
                                 fontSize: 13,
                                 height: 1.5,
                               ),
@@ -329,7 +398,12 @@ class _QuizScreenState extends State<QuizScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: const Color(0xFFD9D3EA),
+                        disabledBackgroundColor: isDark
+                            ? const Color(0xFF39334D)
+                            : const Color(0xFFD9D3EA),
+                        disabledForegroundColor: isDark
+                            ? Colors.white54
+                            : Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -354,8 +428,8 @@ class _QuizScreenState extends State<QuizScreen> {
                   Center(
                     child: Text(
                       'Skor sementara: $score',
-                      style: const TextStyle(
-                        color: Color(0xFF77738A),
+                      style: TextStyle(
+                        color: mutedColor,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

@@ -13,18 +13,27 @@ class TopicScreen extends StatelessWidget {
   });
 
   static const Color primaryColor = Color(0xFF7655E8);
-  static const Color darkColor = Color(0xFF292344);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = isDark
+        ? Colors.white70
+        : const Color(0xFF77738A);
+    final cardColor = theme.colorScheme.surface;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           category.title,
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
-        backgroundColor: const Color(0xFFF8F7FF),
-        foregroundColor: darkColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: textColor,
+        elevation: 0,
       ),
       body: SafeArea(
         child: Center(
@@ -35,18 +44,18 @@ class TopicScreen extends StatelessWidget {
               children: [
                 Text(
                   'Pilih Topik, $playerName!',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w900,
-                    color: darkColor,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Pilih topik ${category.title} yang ingin kamu kuasai.',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
-                    color: Colors.black54,
+                    color: mutedColor,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -58,8 +67,9 @@ class TopicScreen extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 14),
                     child: Material(
-                      color: Colors.white,
+                      color: cardColor,
                       borderRadius: BorderRadius.circular(20),
+                      clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(20),
                         onTap: () {
@@ -79,7 +89,7 @@ class TopicScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: primaryColor.withValues(alpha: 0.12),
+                              color: primaryColor.withValues(alpha: 0.25),
                             ),
                           ),
                           child: Row(
@@ -89,7 +99,9 @@ class TopicScreen extends StatelessWidget {
                                 height: 48,
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: primaryColor.withValues(alpha: 0.10),
+                                  color: primaryColor.withValues(
+                                    alpha: isDark ? 0.25 : 0.10,
+                                  ),
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: Text(
@@ -108,23 +120,24 @@ class TopicScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       topic.title,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 17,
                                         fontWeight: FontWeight.w800,
-                                        color: darkColor,
+                                        color: textColor,
                                       ),
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
                                       topic.description,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.black54,
+                                        color: mutedColor,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               const Icon(
                                 Icons.arrow_forward_ios_rounded,
                                 size: 16,

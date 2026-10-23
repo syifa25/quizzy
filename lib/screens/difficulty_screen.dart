@@ -16,46 +16,61 @@ class DifficultyScreen extends StatelessWidget {
   });
 
   static const Color primaryColor = Color(0xFF7655E8);
-  static const Color darkColor = Color(0xFF292344);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Tingkat Kesulitan',
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
-        backgroundColor: const Color(0xFFF8F7FF),
-        foregroundColor: darkColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: textColor,
+        elevation: 0,
       ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 8,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: 20),
-                  const Text(
+                  const SizedBox(height: 10),
+
+                  Text(
                     'Siap menantang diri?',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
-                      color: darkColor,
+                      color: textColor,
                     ),
                   ),
+
                   const SizedBox(height: 8),
+
                   Text(
                     '${category.title} • ${topic.title}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
-                      color: Colors.black54,
+                      color: isDark
+                          ? Colors.white70
+                          : const Color(0xFF77738A),
                     ),
                   ),
-                  const SizedBox(height: 32),
+
+                  const SizedBox(height: 16),
 
                   _DifficultyCard(
                     title: 'Mudah',
@@ -66,6 +81,7 @@ class DifficultyScreen extends StatelessWidget {
                       _startQuiz(context, QuizDifficulty.easy);
                     },
                   ),
+
                   const SizedBox(height: 16),
 
                   _DifficultyCard(
@@ -77,11 +93,13 @@ class DifficultyScreen extends StatelessWidget {
                       _startQuiz(context, QuizDifficulty.medium);
                     },
                   ),
+
                   const SizedBox(height: 16),
 
                   _DifficultyCard(
                     title: 'Sulit',
-                    description: 'Tantang kemampuanmu dengan soal lebih kompleks.',
+                    description:
+                        'Tantang kemampuanmu dengan soal lebih kompleks.',
                     icon: Icons.local_fire_department_rounded,
                     color: const Color(0xFFE85D75),
                     onTap: () {
@@ -152,9 +170,17 @@ class _DifficultyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = isDark
+        ? Colors.white70
+        : const Color(0xFF77738A);
+
     return Material(
-      color: Colors.white,
+      color: theme.colorScheme.surface,
       borderRadius: BorderRadius.circular(20),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
@@ -162,7 +188,9 @@ class _DifficultyCard extends StatelessWidget {
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color.withValues(alpha: 0.25)),
+            border: Border.all(
+              color: color.withValues(alpha: 0.35),
+            ),
           ),
           child: Row(
             children: [
@@ -170,12 +198,18 @@ class _DifficultyCard extends StatelessWidget {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
+                  color: color.withValues(alpha: isDark ? 0.22 : 0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(icon, color: color, size: 29),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 29,
+                ),
               ),
+
               const SizedBox(width: 16),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,21 +222,26 @@ class _DifficultyCard extends StatelessWidget {
                         color: color,
                       ),
                     ),
+
                     const SizedBox(height: 5),
+
                     Text(
                       description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Colors.black54,
+                        color: mutedColor,
                       ),
                     ),
                   ],
                 ),
               ),
+
+              const SizedBox(width: 8),
+
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16,
-                color: color,
+                color: textColor,
               ),
             ],
           ),

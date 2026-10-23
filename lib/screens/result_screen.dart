@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../models/question.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -15,16 +14,29 @@ class ResultScreen extends StatelessWidget {
     required this.totalQuestions,
     required this.playerName,
     required this.userAnswers,
-    required this.questions
+    required this.questions,
   });
 
   static const Color primaryColor = Color(0xFF7655E8);
-  static const Color darkColor = Color(0xFF292344);
-  static const Color backgroundColor = Color(0xFFF8F7FF);
+  static const Color greenColor = Color(0xFF27AE60);
+  static const Color redColor = Color(0xFFE85D75);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.colorScheme.surface;
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor =
+        isDark ? Colors.white70 : const Color(0xFF77738A);
+
+    final explanationColor =
+        isDark ? const Color(0xFF302B43) : const Color(0xFFF8F7FF);
+
     final int wrongAnswers = totalQuestions - score;
+
     final int finalScore = totalQuestions == 0
         ? 0
         : (score / totalQuestions * 100).round();
@@ -35,20 +47,32 @@ class ResultScreen extends StatelessWidget {
 
     if (finalScore >= 80) {
       resultMessage = 'Amazing Job!';
-      resultDescription = 'Keren banget! Kamu menguasai materi kuis ini.';
+      resultDescription =
+          'Keren banget! Kamu menguasai materi kuis ini.';
       resultIcon = Icons.emoji_events_rounded;
     } else if (finalScore >= 60) {
       resultMessage = 'Good Work!';
-      resultDescription = 'Bagus! Terus belajar untuk mendapatkan hasil lebih tinggi.';
+      resultDescription =
+          'Bagus! Terus belajar untuk mendapatkan hasil lebih tinggi.';
       resultIcon = Icons.workspace_premium_rounded;
     } else {
       resultMessage = 'Keep Learning!';
-      resultDescription = 'Jangan menyerah. Coba lagi dan tingkatkan skormu!';
+      resultDescription =
+          'Jangan menyerah. Coba lagi dan tingkatkan skormu!';
       resultIcon = Icons.auto_awesome_rounded;
     }
 
     return Scaffold(
       backgroundColor: backgroundColor,
+      appBar: AppBar(
+        backgroundColor: backgroundColor,
+        foregroundColor: textColor,
+        elevation: 0,
+        title: const Text(
+          'Hasil Kuis',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -57,7 +81,7 @@ class ResultScreen extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
                   const Text(
                     'QUIZ COMPLETED',
@@ -74,8 +98,8 @@ class ResultScreen extends StatelessWidget {
                   Text(
                     'Hebat, $playerName! 🎉',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: darkColor,
+                    style: TextStyle(
+                      color: textColor,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                     ),
@@ -83,17 +107,20 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 28),
 
-
                   Container(
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFECE6FF),
+                      color: isDark
+                          ? const Color(0xFF302B43)
+                          : const Color(0xFFECE6FF),
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: Icon(
                       resultIcon,
-                      color: primaryColor,
+                      color: isDark
+                          ? const Color(0xFFB6A3FF)
+                          : primaryColor,
                       size: 68,
                     ),
                   ),
@@ -103,8 +130,8 @@ class ResultScreen extends StatelessWidget {
                   Text(
                     resultMessage,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: darkColor,
+                    style: TextStyle(
+                      color: textColor,
                       fontSize: 30,
                       fontWeight: FontWeight.w900,
                     ),
@@ -115,8 +142,8 @@ class ResultScreen extends StatelessWidget {
                   Text(
                     resultDescription,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Color(0xFF77738A),
+                    style: TextStyle(
+                      color: mutedColor,
                       fontSize: 15,
                       height: 1.5,
                     ),
@@ -192,15 +219,15 @@ class ResultScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // REVIEW JAWABAN
-                  const SizedBox(height: 12),
 
-                  const Align(
+                  const SizedBox(height: 28),
+
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Review Jawaban 📝',
                       style: TextStyle(
-                        color: darkColor,
+                        color: textColor,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
@@ -209,12 +236,12 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Yuk, pelajari kembali jawabanmu!',
                       style: TextStyle(
-                        color: Color(0xFF77738A),
+                        color: mutedColor,
                         fontSize: 14,
                       ),
                     ),
@@ -228,18 +255,21 @@ class ResultScreen extends StatelessWidget {
                       final question = questions[index];
 
                       final int? selectedIndex =
-                          index < userAnswers.length ? userAnswers[index] : null;
+                          index < userAnswers.length
+                              ? userAnswers[index]
+                              : null;
 
-                      final bool isCorrect =
+                      final bool hasAnswered = selectedIndex != null &&
+                          selectedIndex >= 0 &&
+                          selectedIndex < question.options.length;
+
+                      final bool isCorrect = hasAnswered &&
                           selectedIndex == question.correctAnswerIndex;
 
-                      final Color statusColor = isCorrect
-                          ? const Color(0xFF27AE60)
-                          : const Color(0xFFE85D75);
+                      final Color statusColor =
+                          isCorrect ? greenColor : redColor;
 
-                      final String selectedAnswer = selectedIndex != null &&
-                              selectedIndex >= 0 &&
-                              selectedIndex < question.options.length
+                      final String selectedAnswer = hasAnswered
                           ? question.options[selectedIndex]
                           : 'Tidak dijawab';
 
@@ -251,7 +281,7 @@ class ResultScreen extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: cardColor,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: statusColor.withValues(alpha: 0.4),
@@ -260,14 +290,13 @@ class ResultScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Nomor soal dan status
                             Row(
                               children: [
                                 Expanded(
                                   child: Text(
                                     'Pertanyaan ${index + 1}',
-                                    style: const TextStyle(
-                                      color: darkColor,
+                                    style: TextStyle(
+                                      color: textColor,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -279,7 +308,9 @@ class ResultScreen extends StatelessWidget {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: statusColor.withValues(alpha: 0.12),
+                                    color: statusColor.withValues(
+                                      alpha: 0.12,
+                                    ),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
@@ -296,11 +327,10 @@ class ResultScreen extends StatelessWidget {
 
                             const SizedBox(height: 12),
 
-                            // Pertanyaan
                             Text(
                               question.question,
-                              style: const TextStyle(
-                                color: darkColor,
+                              style: TextStyle(
+                                color: textColor,
                                 fontSize: 16,
                                 height: 1.4,
                                 fontWeight: FontWeight.w800,
@@ -309,11 +339,10 @@ class ResultScreen extends StatelessWidget {
 
                             const SizedBox(height: 16),
 
-                            // Jawaban pemain
-                            const Text(
+                            Text(
                               'Jawaban kamu:',
                               style: TextStyle(
-                                color: Color(0xFF77738A),
+                                color: mutedColor,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -325,20 +354,18 @@ class ResultScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Icon(
-                                  selectedIndex != null && isCorrect
+                                  isCorrect
                                       ? Icons.check_circle_rounded
                                       : Icons.cancel_rounded,
-                                  color: selectedIndex != null && isCorrect
-                                      ? const Color(0xFF27AE60)
-                                      : const Color(0xFFE85D75),
+                                  color: statusColor,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     selectedAnswer,
-                                    style: const TextStyle(
-                                      color: darkColor,
+                                    style: TextStyle(
+                                      color: textColor,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -347,14 +374,13 @@ class ResultScreen extends StatelessWidget {
                               ],
                             ),
 
-                            // Tampilkan jawaban benar jika pemain salah.
                             if (!isCorrect) ...[
                               const SizedBox(height: 12),
 
-                              const Text(
+                              Text(
                                 'Jawaban yang benar:',
                                 style: TextStyle(
-                                  color: Color(0xFF77738A),
+                                  color: mutedColor,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -367,7 +393,7 @@ class ResultScreen extends StatelessWidget {
                                 children: [
                                   const Icon(
                                     Icons.check_circle_rounded,
-                                    color: Color(0xFF27AE60),
+                                    color: greenColor,
                                     size: 20,
                                   ),
                                   const SizedBox(width: 8),
@@ -375,7 +401,7 @@ class ResultScreen extends StatelessWidget {
                                     child: Text(
                                       correctAnswer,
                                       style: const TextStyle(
-                                        color: Color(0xFF27AE60),
+                                        color: greenColor,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800,
                                       ),
@@ -387,12 +413,11 @@ class ResultScreen extends StatelessWidget {
 
                             const SizedBox(height: 16),
 
-                            // Penjelasan jawaban
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF8F7FF),
+                                color: explanationColor,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Column(
@@ -409,8 +434,8 @@ class ResultScreen extends StatelessWidget {
                                   const SizedBox(height: 6),
                                   Text(
                                     question.explanation,
-                                    style: const TextStyle(
-                                      color: darkColor,
+                                    style: TextStyle(
+                                      color: textColor,
                                       fontSize: 13,
                                       height: 1.5,
                                     ),
@@ -425,7 +450,6 @@ class ResultScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 16),
-                  const SizedBox(height: 28),
 
                   SizedBox(
                     width: double.infinity,
@@ -463,16 +487,22 @@ class ResultScreen extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: () {
                         Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/',
-                            (route) => false,
-                          );
-                        },
+                          context,
+                          '/',
+                          (route) => false,
+                        );
+                      },
                       icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Lihat Hasil Lagi'),
+                      label: const Text('Main Lagi'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: primaryColor,
-                        side: const BorderSide(color: primaryColor),
+                        foregroundColor: isDark
+                            ? const Color(0xFFB6A3FF)
+                            : primaryColor,
+                        side: BorderSide(
+                          color: isDark
+                              ? const Color(0xFFB6A3FF)
+                              : primaryColor,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -486,11 +516,11 @@ class ResultScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  const Text(
+                  Text(
                     'Thanks for playing with Quizzy! 💜',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xFF9691A9),
+                      color: mutedColor,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),

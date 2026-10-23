@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'name_screen.dart';
+import '../theme_controller.dart';
+import 'history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,8 +13,17 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : darkColor;
+    final mutedColor = isDark
+        ? Colors.white70
+        : const Color(0xFF77738A);
+    final cardColor = isDark
+        ? const Color(0xFF242424)
+        : Colors.white;
+
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -39,37 +50,69 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Text(
+
+                      Text(
                         'Quizzy',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
-                          color: darkColor,
+                          color: textColor,
                         ),
                       ),
+
                       const Spacer(),
+
+                      // Theme toggle
+                      Container(
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: IconButton(
+                          tooltip: isDark
+                              ? 'Aktifkan Light Mode'
+                              : 'Aktifkan Dark Mode',
+                          onPressed: () {
+                            themeNotifier.value = isDark
+                                ? ThemeMode.light
+                                : ThemeMode.dark;
+                          },
+                          icon: Icon(
+                            isDark
+                                ? Icons.light_mode_rounded
+                                : Icons.dark_mode_rounded,
+                            color: isDark
+                                ? yellowColor
+                                : primaryColor,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      // Badge
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: cardColor,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.bolt_rounded,
                               color: yellowColor,
                               size: 20,
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text(
-                              'Let’s Play!',
+                              "Let's Play!",
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: darkColor,
+                                color: textColor,
                               ),
                             ),
                           ],
@@ -93,25 +136,26 @@ class HomeScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  const Text(
-                    'Test Your\\nKnowledge!',
+                  // Main heading
+                  Text(
+                    'Test Your Knowledge!',
                     style: TextStyle(
                       fontSize: 38,
                       height: 1.15,
                       fontWeight: FontWeight.w900,
-                      color: darkColor,
+                      color: textColor,
                     ),
                   ),
 
                   const SizedBox(height: 12),
 
-                  const Text(
+                  Text(
                     'Siap menguji pengetahuanmu? Yuk, jawab '
                     'pertanyaan seru dan buktikan kemampuanmu!',
                     style: TextStyle(
                       fontSize: 15,
                       height: 1.6,
-                      color: Color(0xFF77738A),
+                      color: mutedColor,
                     ),
                   ),
 
@@ -164,7 +208,7 @@ class HomeScreen extends StatelessWidget {
 
                         Text(
                           'Asah kemampuanmu lewat kuis '
-                          'pengetahuan teknologi dan komputer.',
+                          'pengetahuan dengan berbagai topik menarik.',
                           style: TextStyle(
                             fontSize: 14,
                             height: 1.5,
@@ -174,22 +218,24 @@ class HomeScreen extends StatelessWidget {
 
                         const SizedBox(height: 24),
 
-                        Row(
-                          children: [
+                        Wrap(
+                          spacing: 20,
+                          runSpacing: 12,
+                          children: const [
                             _InfoItem(
                               icon: Icons.quiz_rounded,
-                              title: '10 Questions',
+                              title: 'Multiple Questions',
                             ),
-                            const SizedBox(width: 20),
                             _InfoItem(
                               icon: Icons.category_rounded,
-                              title: 'Technology',
+                              title: '3 Categories',
                             ),
                           ],
                         ),
 
                         const SizedBox(height: 28),
 
+                                                
                         SizedBox(
                           width: double.infinity,
                           height: 54,
@@ -226,6 +272,33 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 12),
+
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const HistoryScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.history_rounded),
+                            label: const Text('Riwayat Permainan'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              side: const BorderSide(color: Colors.white70),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+
                       ],
                     ),
                   ),
@@ -233,13 +306,13 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Footer
-                  const Center(
+                  Center(
                     child: Text(
                       'Learn something new, one quiz at a time 💜',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF9691A9),
+                        color: mutedColor.withValues(alpha: 0.85),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -265,28 +338,26 @@ class _InfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Flexible(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: const Color(0xFFFFC857),
-            size: 20,
-          ),
-          const SizedBox(width: 7),
-          Flexible(
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          color: const Color(0xFFFFC857),
+          size: 20,
+        ),
+        const SizedBox(width: 7),
+        Flexible(
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
