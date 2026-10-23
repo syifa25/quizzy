@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
 import 'result_screen.dart';
-import '../data/questions_data.dart';
+import '../models/question.dart';
+
+
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+  final String playerName;
+  final List<Question> questions;
+  final String categoryName;
+  final String topicName;
+  final String difficulty;
+  
+
+  const QuizScreen({
+    super.key,
+    required this.playerName,
+    required this.questions,
+    required this.categoryName,
+    required this.topicName,
+    required this.difficulty,
+  });
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -14,6 +30,9 @@ class _QuizScreenState extends State<QuizScreen> {
   int? selectedAnswerIndex;
   int score = 0;
   bool isAnswerChecked = false;
+
+  // Menyimpan jawaban pemain untuk setiap pertanyaan.
+  final List<int?> userAnswers = [];
 
   static const Color primaryColor = Color(0xFF7655E8);
   static const Color darkColor = Color(0xFF292344);
@@ -35,8 +54,11 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       isAnswerChecked = true;
 
+      // Simpan jawaban yang dipilih pemain.
+      userAnswers.add(selectedAnswerIndex);
+
       if (selectedAnswerIndex ==
-          quizQuestions[currentQuestionIndex].correctAnswerIndex) {
+          widget.questions[currentQuestionIndex].correctAnswerIndex) {
         score++;
       }
     });
@@ -45,7 +67,7 @@ class _QuizScreenState extends State<QuizScreen> {
   void nextQuestion() {
     if (!isAnswerChecked) return;
 
-    if (currentQuestionIndex < quizQuestions.length - 1) {
+    if (currentQuestionIndex < widget.questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
         selectedAnswerIndex = null;
@@ -57,7 +79,10 @@ class _QuizScreenState extends State<QuizScreen> {
         MaterialPageRoute(
           builder: (context) => ResultScreen(
             score: score,
-            totalQuestions: quizQuestions.length,
+            totalQuestions: widget.questions.length,
+            playerName: widget.playerName,
+            userAnswers: List<int?>.from(userAnswers),
+            questions: List<Question>.from(widget.questions),
           ),
         ),
       );
@@ -66,16 +91,17 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final question = quizQuestions[currentQuestionIndex];
-    final progress = (currentQuestionIndex + 1) / quizQuestions.length;
+    final questions = widget.questions;
+    final question = questions[currentQuestionIndex];
+    final progress = (currentQuestionIndex + 1) / questions.length;
 
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
-        title: const Text(
-          'Quiz Time!',
-          style: TextStyle(fontWeight: FontWeight.w800),
+                title: Text(
+          'Quiz Time, ${widget.playerName}!',
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
@@ -104,7 +130,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         ),
                       ),
                       Text(
-                        '${currentQuestionIndex + 1}/${quizQuestions.length}',
+                        '${currentQuestionIndex + 1}/${questions.length}',
                         style: const TextStyle(
                           color: darkColor,
                           fontWeight: FontWeight.w800,
@@ -311,7 +337,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       ),
                       child: Text(
                         isAnswerChecked
-                            ? currentQuestionIndex == quizQuestions.length - 1
+                            ? currentQuestionIndex == questions.length - 1
                                 ? 'Selesaikan Kuis'
                                 : 'Pertanyaan Berikutnya'
                             : 'Periksa Jawaban',
