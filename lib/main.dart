@@ -18,23 +18,19 @@ class QuizzyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Nunito',
         scaffoldBackgroundColor: const Color(0xFFF8F7FF),
-
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF7655E8),
           primary: const Color(0xFF7655E8),
           secondary: const Color(0xFFFFC857),
           surface: Colors.white,
         ),
-
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFF8F7FF),
-          foregroundColor: Color(0xFF292344),
-          elevation: 0,
-          centerTitle: false,
-        ),
       ),
 
-      home: const HomeScreen(),
+      routes: {
+        '/': (context) => const HomeScreen(),
+      },
+
+      
     );
   }
 }

@@ -151,7 +151,7 @@ class HomeScreen extends StatelessWidget {
                         const SizedBox(height: 18),
 
                         const Text(
-                          'Ready to\\nChallenge Yourself?',
+                          'Ready to Challenge Yourself?',
                           style: TextStyle(
                             fontSize: 25,
                             height: 1.25,

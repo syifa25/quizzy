@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'result_screen.dart';
 import '../data/questions_data.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -51,10 +52,13 @@ class _QuizScreenState extends State<QuizScreen> {
         isAnswerChecked = false;
       });
     } else {
-      // Halaman hasil akan kita hubungkan pada tahap berikutnya.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Kuis selesai! Skor kamu: $score/${quizQuestions.length}'),
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(
+            score: score,
+            totalQuestions: quizQuestions.length,
+          ),
         ),
       );
     }
